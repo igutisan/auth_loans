@@ -13,7 +13,7 @@ import java.time.LocalDate;
 
 import java.util.UUID;
 
-@Table(name = "user_entity")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -49,8 +49,8 @@ public class UserEntity {
     @Column("salary")
     private BigDecimal salary;
 
-    @Column("rol")
-    private UserRoles rol;
+    @Column("role")
+    private UserRoles role;
 
 
 }

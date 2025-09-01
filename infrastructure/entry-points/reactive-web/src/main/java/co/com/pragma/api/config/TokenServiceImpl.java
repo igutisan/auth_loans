@@ -18,11 +18,11 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken(User user) {
-        System.out.println(user.getRol());
+        System.out.println(user.getRole());
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority(user.getRol().name()))
+                Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()))
         );
         return jwtProvider.generateToken(userDetails);
     }

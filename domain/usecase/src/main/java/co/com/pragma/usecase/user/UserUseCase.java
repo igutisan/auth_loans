@@ -18,6 +18,7 @@ public class UserUseCase {
 
 
    public Mono<User> registerUser(User user) {
+       System.out.println("rol: "+user.getRole());
         logs.logInfo("Registering user");
         return  emailIsUnique(user.getEmail())
                 .then(userRepository.save(user));

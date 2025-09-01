@@ -61,4 +61,19 @@ public record CreateUserDto(
         @Pattern(regexp = "(?i)^(ADMIN|ASESOR|CLIENTE)$", message = "El rol no es válido. Debe ser ADMIN, ASESOR o CLIENTE.")
         String role
 ) {
+
+    public CreateUserDto withPasswordEncoded(String password) {
+        return new CreateUserDto(
+                this.names,
+                this.lastNames,
+                this.dob,
+                password,
+                this.phone ,
+                this.address,
+                this.email ,
+                this.dni ,
+                this.salary,
+                this.role
+        );
+    }
 }

@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements ReactiveUserDetailsService {
     }
 
     private UserDetails buildUserDetails(User user) {
-        Collection<? extends GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getRol().name()));
+        Collection<? extends GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()));
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 }

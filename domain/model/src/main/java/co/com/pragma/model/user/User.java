@@ -25,5 +25,5 @@ public class User {
     private String address;
     private String email;
     private BigDecimal salary;
-    private UserRoles rol;
+    private UserRoles role;
 }

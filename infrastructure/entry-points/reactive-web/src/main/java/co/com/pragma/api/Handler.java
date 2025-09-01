@@ -12,6 +12,7 @@ import co.com.pragma.usecase.user.UserUseCase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -58,7 +59,7 @@ public class Handler {
     }
 
 
-
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ASESOR')")
     public Mono<ServerResponse> listenRegisterUser(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(CreateUserDto.class)
                 .flatMap(dto -> {
@@ -80,8 +81,9 @@ public class Handler {
                                 "Error en la validación de los datos", fieldErrors));
                     }
 
+                    String encodedPassword = passwordEncoder.encode(dto.password());
 
-                    return Mono.just(dto);
+                    return Mono.just(dto.withPasswordEncoded(encodedPassword));
                 })
                 .map(userMapper::toModel)
                 .flatMap(userUseCase::registerUser)

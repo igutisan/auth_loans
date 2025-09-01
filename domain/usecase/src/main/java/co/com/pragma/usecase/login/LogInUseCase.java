@@ -1,6 +1,5 @@
 package co.com.pragma.usecase.login;
 
-import co.com.pragma.model.user.User;
 import co.com.pragma.model.user.gateways.PasswordService;
 import co.com.pragma.model.user.gateways.TokenService;
 import co.com.pragma.model.user.gateways.UserRepository;
@@ -20,7 +19,7 @@ public class LogInUseCase {
                     if (!passwordService.matches(password, user.getPassword())){
                         return Mono.error(new RuntimeException("Invalid password"));
                     }
-                    System.out.println(user.getRol());
+                    System.out.println(user.getRole());
                         return Mono.just(tokenService.generateToken(user));
                 });
     }

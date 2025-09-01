@@ -32,7 +32,7 @@ public class RouterRest {
                     beanMethod = "listenExistUserByDni"
             ),
             @RouterOperation(
-                    path = "/auth/login",
+                    path = "/api/v1/login",
                     method = RequestMethod.POST,
                     beanClass = Handler.class,
                     beanMethod = "listenLogin"
@@ -41,6 +41,6 @@ public class RouterRest {
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
         return route(POST("/api/v1/users"), handler::listenRegisterUser)
                 .andRoute(GET("/api/v1/users/{dni}"), handler::listenExistUserByDni)
-                .andRoute(POST("/auth/login"), handler::listenLogin);
+                .andRoute(POST("/api/v1/login"), handler::listenLogin);
     }
 }
