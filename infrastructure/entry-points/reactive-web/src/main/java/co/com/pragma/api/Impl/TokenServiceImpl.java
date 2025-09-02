@@ -1,4 +1,4 @@
-package co.com.pragma.api.config;
+package co.com.pragma.api.Impl;
 
 import co.com.pragma.api.jwt.jwt.JwtProvider;
 import co.com.pragma.model.user.User;
@@ -18,12 +18,6 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken(User user) {
-        System.out.println(user.getRole());
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()))
-        );
-        return jwtProvider.generateToken(userDetails);
+        return jwtProvider.generateToken(user);
     }
 }

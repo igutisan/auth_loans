@@ -1,6 +1,7 @@
 package co.com.pragma.api.jwt.jwt;
 
 
+import co.com.pragma.api.config.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,19 +15,18 @@ import reactor.core.publisher.Mono;
 public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
 
     private final JwtProvider jwtProvider;
-    private final ReactiveUserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         return Mono.just(authentication)
                 .map(auth -> jwtProvider.getClaims(auth.getCredentials().toString()))
-                .log()
                 .onErrorResume(e -> Mono.error(new Throwable("bad token")))
                 .flatMap(claims -> {
-                    String username = claims.getSubject();
-                    return userDetailsService.findByUsername(username)
+                    String id = claims.getSubject();
+                    return userDetailsService.findById(id)
                             .map(userDetails -> new UsernamePasswordAuthenticationToken(
-                                    userDetails.getUsername(),
+                                    userDetails,
                                     null,
                                     userDetails.getAuthorities()
                             ));

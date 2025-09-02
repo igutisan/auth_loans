@@ -20,14 +20,14 @@ management:
     health:
       probes:
         enabled: true
+  health:
+    circuitbreakers:
+      enabled: true
 jwt:
-  secret: ${JWT_SECRET:bXlzZWNyZXRrZXlmb3Jqd3RzZWNyZXRrZXltdXN0YmVsb25nZW5vdWdoZm9ySFMyNTZhbGdvcml0aG0=}
-  expiration: ${JWT_EXPIRATION:3600000}
-
+  secret: "${JWT_SECRET:bXlzZWNyZXRrZXlmb3Jqd3RzZWNyZXRrZXltdXN0YmVsb25nZW5vdWdoZm9ySFMyNTZhbGdvcml0aG0=}"
+  expiration: "${JWT_EXPIRATION:3600000}"
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
-
-
 adapters:
   r2dbc:
     host: "localhost"
@@ -36,16 +36,39 @@ adapters:
     schema: "public"
     username: "test"
     password: "P@55w0rd"
-
 springdoc:
   api-docs:
-    path: /api-docs
+    path: "/api-docs"
   swagger-ui:
-    path: /swagger-ui.html
-  packages-to-scan: co.com.pragma.api
-
+    path: "/swagger-ui.html"
+  packages-to-scan: "co.com.pragma.api"
 info:
   app:
     name: "Auth Service"
     version: "1.0.0"
     description: "API for authentication and authorization"
+adapter:
+  restconsumer:
+    timeout: 5000
+    url: "http://localhost:8081"
+resilience4j:
+  circuitbreaker:
+    instances:
+      testGet:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: "2s"
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 10
+        waitDurationInOpenState: "10s"
+      testPost:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: "2s"
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 10
+        waitDurationInOpenState: "10s"

@@ -19,7 +19,6 @@ public class LogInUseCase {
                     if (!passwordService.matches(password, user.getPassword())){
                         return Mono.error(new RuntimeException("Invalid password"));
                     }
-                    System.out.println(user.getRole());
                         return Mono.just(tokenService.generateToken(user));
                 });
     }

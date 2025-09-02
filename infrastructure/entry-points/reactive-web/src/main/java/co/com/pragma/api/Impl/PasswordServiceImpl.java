@@ -1,4 +1,4 @@
-package co.com.pragma.api.config;
+package co.com.pragma.api.Impl;
 
 import co.com.pragma.model.user.gateways.PasswordService;
 import lombok.RequiredArgsConstructor;
