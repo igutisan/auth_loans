@@ -2,6 +2,8 @@ package co.com.pragma.api.jwt.jwt;
 
 
 import co.com.pragma.api.config.UserDetailsServiceImpl;
+import co.com.pragma.api.exceptions.TokenException;
+import co.com.pragma.model.user.gateways.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,23 +16,20 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
 
-    private final JwtProvider jwtProvider;
+    private final TokenService jwtProvider;
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         return Mono.just(authentication)
-                .map(auth -> jwtProvider.getClaims(auth.getCredentials().toString()))
-                .onErrorResume(e -> Mono.error(new Throwable("bad token")))
-                .flatMap(claims -> {
-                    String id = claims.getSubject();
-                    return userDetailsService.findById(id)
-                            .map(userDetails -> new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            ));
-                });
+                .map(auth -> jwtProvider.getSubject(auth.getCredentials().toString()))
+                .onErrorResume(e -> Mono.error(new TokenException("Invalid token")))
+                .flatMap(id -> userDetailsService.findById(id)
+                        .map(userDetails -> new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        )));
     }
 }
 

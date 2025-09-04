@@ -1,6 +1,6 @@
 package co.com.pragma.api.config;
 
-import co.com.pragma.api.jwt.SecurityContextRepository;
+import co.com.pragma.api.jwt.jwt.SecurityContextRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.web.reactive.config.EnableWebFlux;
+
 
 @Configuration
 @EnableWebFluxSecurity

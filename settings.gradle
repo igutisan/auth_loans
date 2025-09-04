@@ -28,3 +28,5 @@ include ':logger-adapter'
 project(':logger-adapter').projectDir = file('./infrastructure/driven-adapters/logger-adapter')
 include ':rest-consumer'
 project(':rest-consumer').projectDir = file('./infrastructure/driven-adapters/rest-consumer')
+include ':jwt-adapter'
+project(':jwt-adapter').projectDir = file('./infrastructure/driven-adapters/jwt-adapter')

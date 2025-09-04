@@ -22,7 +22,7 @@ public class UserEntity {
     @Id
     private UUID id;
 
-    @Column("name")
+    @Column("names")
     private String names;
 
     @Column("last_names")

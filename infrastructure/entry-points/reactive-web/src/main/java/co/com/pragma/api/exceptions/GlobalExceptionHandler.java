@@ -1,6 +1,7 @@
 package co.com.pragma.api.exceptions;
 
 
+import co.com.pragma.model.user.exceptions.BadCredentials;
 import co.com.pragma.model.user.exceptions.EmailAlreadyExistException;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -72,6 +73,25 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
                     request.path()
             );
         }
+        // Manejar credenciales invalidas
+        if (error instanceof BadCredentials) {
+            return buildErrorResponse(
+                    HttpStatus.UNAUTHORIZED,
+                    "BAD_CREDENTIALS",
+                    error.getMessage(),
+                    request.path()
+            );
+        }
+
+        // Manejar TokenException
+        if (error instanceof TokenException) {
+            return buildErrorResponse(
+                    HttpStatus.UNAUTHORIZED,
+                    "INVALID_TOKEN",
+                    error.getMessage(),
+                    request.path()
+            );
+        }
 
         // Error genérico
         return buildErrorResponse(
@@ -90,7 +110,6 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
                                                     Map<String, String> fieldErrors) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("timestamp", LocalDateTime.now());
-        errorResponse.put("status", status.value());
         errorResponse.put("code", code);
         errorResponse.put("message", message != null ? message : "Sin mensaje disponible");
         errorResponse.put("path", path);

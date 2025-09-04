@@ -1,5 +1,8 @@
 package co.com.pragma.api.config;
 
+import co.com.pragma.api.exceptions.TokenException;
+import co.com.pragma.model.user.gateways.TokenService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -9,7 +12,10 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 @Component
+@RequiredArgsConstructor
 public class JwtFilter implements WebFilter {
+
+    private final TokenService jwtProvider;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -19,10 +25,13 @@ public class JwtFilter implements WebFilter {
             return chain.filter(exchange);
         String auth = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if(auth == null)
-            return Mono.error(new Throwable("no token was found"));
+            return Mono.error(new TokenException("no token was found"));
         if(!auth.startsWith("Bearer "))
-            return Mono.error(new Throwable("invalid auth"));
+            return Mono.error(new TokenException("invalid auth"));
+
         String token = auth.replace("Bearer ", "");
+
+
         exchange.getAttributes().put("token", token);
         return chain.filter(exchange);
     }

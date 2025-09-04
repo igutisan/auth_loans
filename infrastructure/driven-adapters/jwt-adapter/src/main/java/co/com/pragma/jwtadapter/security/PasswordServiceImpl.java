@@ -1,4 +1,4 @@
-package co.com.pragma.api.Impl;
+package co.com.pragma.jwtadapter.security;
 
 import co.com.pragma.model.user.gateways.PasswordService;
 import lombok.RequiredArgsConstructor;

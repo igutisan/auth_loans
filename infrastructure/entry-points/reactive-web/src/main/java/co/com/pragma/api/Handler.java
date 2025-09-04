@@ -6,6 +6,7 @@ import co.com.pragma.api.dto.LoginDto;
 import co.com.pragma.api.exceptions.ValidationException;
 import co.com.pragma.api.mapper.UserDTOMapper;
 
+import co.com.pragma.model.user.gateways.PasswordService;
 import co.com.pragma.usecase.login.LogInUseCase;
 import co.com.pragma.usecase.user.UserUseCase;
 
@@ -13,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
@@ -40,7 +41,7 @@ public class Handler {
     private final LogInUseCase logInUseCase;
     private final UserDTOMapper userMapper;
     private final TransactionalOperator transactionalOperator;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordService passwordService;
 
 
 
@@ -81,7 +82,7 @@ public class Handler {
                                 "Error en la validación de los datos", fieldErrors));
                     }
 
-                    String encodedPassword = passwordEncoder.encode(dto.password());
+                    String encodedPassword = passwordService.encode(dto.password());
 
                     return Mono.just(dto.withPasswordEncoded(encodedPassword));
                 })

@@ -1,7 +1,8 @@
-package co.com.pragma.api.jwt.jwt;
+package co.com.pragma.jwtadapter.jwt;
 
 
 import co.com.pragma.model.user.User;
+import co.com.pragma.model.user.gateways.TokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -15,10 +16,8 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 
-
-
 @Component
-public class JwtProvider {
+public class JwtProvider implements TokenService {
 
     private static final Logger LOGGER =  Logger.getLogger(JwtProvider.class.getName());
 
@@ -27,6 +26,7 @@ public class JwtProvider {
     @Value("${jwt.expiration}")
     private Integer expiration;
 
+    @Override
     public String generateToken(User user) {
         return Jwts.builder()
                 .subject(user.getId())
@@ -37,15 +37,7 @@ public class JwtProvider {
                 .signWith(getKey(secret))
                 .compact();
     }
-
-    public Claims getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getKey(secret))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
-
+    @Override
     public String getSubject(String token) {
         return Jwts.parser()
                 .verifyWith(getKey(secret))
@@ -55,6 +47,7 @@ public class JwtProvider {
                 .getSubject();
     }
 
+    @Override
     public boolean validate(String token){
         try {
             Jwts.parser()
@@ -77,6 +70,16 @@ public class JwtProvider {
         }
         return false;
     }
+
+    public Claims getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getKey(secret))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+
 
     private SecretKey getKey(String secret) {
         byte[] secretBytes = Decoders.BASE64URL.decode(secret);
