@@ -40,7 +40,6 @@ public class RouterRest {
     })
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
         return route(POST("/api/v1/users"), handler::listenRegisterUser)
-                .andRoute(GET("/api/v1/users/{dni}"), handler::listenExistUserByDni)
                 .andRoute(POST("/api/v1/login"), handler::listenLogin);
     }
 }

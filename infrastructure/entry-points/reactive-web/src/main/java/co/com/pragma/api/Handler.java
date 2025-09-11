@@ -46,25 +46,12 @@ public class Handler {
 
 
 
-    public Mono<ServerResponse> listenExistUserByDni(ServerRequest serverRequest) {
-        String dni = serverRequest.pathVariable("dni");
-        return userUseCase.existUserByDni(dni)
-                .flatMap(exists -> {
-                    log.info("Validating user");
-                    if(exists){
-                        return ServerResponse.ok().bodyValue(Map.of("exists", true));
-                    }
-                    return ServerResponse.notFound().build();
-                });
-
-    }
-
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ASESOR')")
     public Mono<ServerResponse> listenRegisterUser(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(CreateUserDto.class)
                 .flatMap(dto -> {
-                    log.info("Validating dto");
+                    log.debug("Validating dto");
                     Errors errors = new BeanPropertyBindingResult(dto, "dto");
                     validator.validate(dto, errors);
 
@@ -93,14 +80,6 @@ public class Handler {
                 .flatMap(userResponse -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(userResponse));
-    }
-
-    public Mono<ServerResponse> listenGetUserByDni(ServerRequest serverRequest) {
-        String dni = serverRequest.pathVariable("dni");
-        return userUseCase.getUserByDni(dni)
-                .map(userMapper::toResponseDto)
-                .flatMap(user -> ServerResponse.ok().bodyValue(user))
-                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> listenLogin(ServerRequest serverRequest) {
