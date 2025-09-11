@@ -13,6 +13,9 @@ local.properties
 .settings/
 .loadpath
 .recommenders
+domain-coverage-report.sh
+GEMINI.md
+WARP.md
 /postgres-data
 
 # External tool builders
