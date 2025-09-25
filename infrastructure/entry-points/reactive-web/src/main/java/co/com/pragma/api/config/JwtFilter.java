@@ -4,8 +4,10 @@ import co.com.pragma.api.exceptions.TokenException;
 import co.com.pragma.model.user.gateways.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -19,17 +21,21 @@ public class JwtFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
-        String path = request.getPath().value();
-        if(path.contains("login"))
-            return chain.filter(exchange);
-        String auth = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if(auth == null)
-            return Mono.error(new TokenException("no token was found"));
-        if(!auth.startsWith("Bearer "))
-            return Mono.error(new TokenException("invalid auth"));
+        String path = exchange.getRequest().getPath().value();
 
-        String token = auth.replace("Bearer ", "");
+
+        if(path.contains("login")|| path.contains("actuator")|| path.contains("swagger-ui")|| path.contains("v3/api-docs")) {
+            return chain.filter(exchange);
+        }
+
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token no proporcionado o formato inválido"));
+        }
+
+        String token = authHeader.substring(7);
 
 
         exchange.getAttributes().put("token", token);

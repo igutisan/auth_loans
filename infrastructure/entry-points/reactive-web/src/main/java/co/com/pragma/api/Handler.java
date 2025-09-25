@@ -84,6 +84,29 @@ public class Handler {
 
     public Mono<ServerResponse> listenLogin(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(LoginDto.class)
+                .flatMap(dto -> {
+                    log.debug("Validating dto login");
+                    Errors errors = new BeanPropertyBindingResult(dto, "dto");
+
+                    validator.validate(dto, errors);
+
+
+                    if (errors.hasErrors()) {
+                        log.error("Errors found in mapping logindto");
+
+                        Map<String, String> fieldErrors = new HashMap<>();
+                        errors.getFieldErrors().forEach(error -> {
+                            String fieldName = error.getField();
+                            String errorMessage = error.getDefaultMessage();
+                            fieldErrors.put(fieldName, errorMessage);
+                        });
+
+                        return Mono.<LoginDto>error(new ValidationException(
+                                "Error en la validación de los datos", fieldErrors));
+                    }
+
+                    return Mono.just(dto);
+                })
                 .flatMap(dto -> logInUseCase.login(dto.email(), dto.password()))
                 .flatMap(token -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)

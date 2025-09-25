@@ -2,7 +2,9 @@ package co.com.pragma.api.jwt.jwt;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
@@ -16,7 +18,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     private final JwtAuthenticationManager jwtAuthenticationManager;
 
-    @Override
+    /*@Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
         return Mono.empty();
     }
@@ -26,5 +28,30 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         String token = exchange.getAttribute("token");
         return jwtAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(token, token))
                 .map(SecurityContextImpl::new);
+    }*/
+
+    @Override
+    public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
+        return Mono.empty();
+    }
+
+    @Override
+    public Mono<SecurityContext> load(ServerWebExchange exchange) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String authToken = authHeader.substring(7);
+
+
+            Authentication auth = new UsernamePasswordAuthenticationToken(authToken, authToken);
+
+
+            return this.jwtAuthenticationManager.authenticate(auth)
+                    .map(SecurityContextImpl::new);
+        } else {
+
+            return Mono.empty();
+        }
     }
 }

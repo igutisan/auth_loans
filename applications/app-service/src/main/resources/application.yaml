@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: "${PORT}"
 spring:
   application:
     name: "Auth"
@@ -10,7 +10,7 @@ spring:
       enabled: true
       path: "/h2"
   profiles:
-    include: null
+    active: "${PROFILE:dev}"
 management:
   endpoints:
     web:
@@ -24,18 +24,18 @@ management:
     circuitbreakers:
       enabled: true
 jwt:
-  secret: "${JWT_SECRET:bXlzZWNyZXRrZXlmb3Jqd3RzZWNyZXRrZXltdXN0YmVsb25nZW5vdWdoZm9ySFMyNTZhbGdvcml0aG0=}"
-  expiration: "${JWT_EXPIRATION:3600000}"
+  secret: "${JWT_SECRET}"
+  expiration: "${JWT_EXPIRATION}"
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 adapters:
   r2dbc:
-    host: "localhost"
-    port: 5432
-    database: "test"
-    schema: "public"
-    username: "test"
-    password: "P@55w0rd"
+    host: "${DB_HOST}"
+    port: "${DB_PORT:5432}"
+    database: "${DB_NAME}"
+    username: "${DB_USERNAME}"
+    password: "${DB_PASSWORD}"
+    ssl: REQUIRE
 springdoc:
   api-docs:
     path: "/api-docs"
@@ -50,7 +50,7 @@ info:
 adapter:
   restconsumer:
     timeout: 5000
-    url: "http://localhost:8081"
+    url: "${URL_PETITIONS}"
 resilience4j:
   circuitbreaker:
     instances:
@@ -72,3 +72,5 @@ resilience4j:
         slidingWindowSize: 10
         minimumNumberOfCalls: 10
         waitDurationInOpenState: "10s"
+aws:
+  region: "us-east-2"

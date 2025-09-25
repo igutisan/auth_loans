@@ -1,15 +1,41 @@
 version: "3.8"
+
+networks:
+  auth-net:
+    driver: bridge
+
 services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile
+    container_name: auth-app
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_R2DBC_URL=r2dbc:postgresql://postgres:5432/${ADAPTERS_R2DBC_DATABASE}
+      - SPRING_R2DBC_USERNAME=${ADAPTERS_R2DBC_USERNAME}
+      - SPRING_R2DBC_PASSWORD=${ADAPTERS_R2DBC_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - auth-net
+
   postgres:
     image: postgres:16
-    container_name: postgres-test
+    container_name: postgres-auth
     restart: always
     environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: P@55w0rd
-      POSTGRES_DB: test
+      POSTGRES_USER: ${ADAPTERS_R2DBC_USERNAME}
+      POSTGRES_PASSWORD: ${ADAPTERS_R2DBC_PASSWORD}
+      POSTGRES_DB: ${ADAPTERS_R2DBC_DATABASE}
     ports:
       - "5432:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     command: ["postgres", "-c", "listen_addresses=*"]
+    networks:
+        - auth-net
+

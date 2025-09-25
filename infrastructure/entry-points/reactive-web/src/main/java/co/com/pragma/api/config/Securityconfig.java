@@ -1,5 +1,6 @@
 package co.com.pragma.api.config;
 
+import co.com.pragma.api.jwt.jwt.JwtAuthenticationManager;
 import co.com.pragma.api.jwt.jwt.SecurityContextRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @RequiredArgsConstructor
 public class Securityconfig {
     private final SecurityContextRepository securityContextRepository;
-
+    private final JwtAuthenticationManager jwtAuthenticationManager;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -30,13 +31,18 @@ public class Securityconfig {
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http, JwtFilter jwtFilter) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchangeSpec -> exchangeSpec.pathMatchers("/api/v1/login").permitAll()
-                        .anyExchange().authenticated())
-                .addFilterAfter(jwtFilter, SecurityWebFiltersOrder.FIRST)
+                .authorizeExchange(exchangeSpec ->
+                        exchangeSpec.pathMatchers("/api/v1/login").permitAll()
+                                .pathMatchers("/actuator/**").permitAll()
+                                .pathMatchers("/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/webjars/swagger-ui/**").permitAll()
+                                .anyExchange().authenticated()
+                )
+                .authenticationManager(jwtAuthenticationManager)
                 .securityContextRepository(securityContextRepository)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-                .logout(ServerHttpSecurity.LogoutSpec::disable)
                 .build();
     }
 }

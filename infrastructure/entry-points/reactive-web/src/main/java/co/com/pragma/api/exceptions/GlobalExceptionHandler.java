@@ -14,7 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;
 
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.server.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -41,6 +43,16 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     private Mono<ServerResponse> formatErrorResponse(ServerRequest request) {
         Throwable error = getError(request);
 
+        if (error instanceof ResponseStatusException ex && ex.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+            return buildErrorResponse(
+                    HttpStatus.NOT_FOUND,
+                    "RESOURCE_NOT_FOUND",
+                    "El recurso solicitado no fue encontrado.",
+                    request.path()
+            );
+        }
+
+
 
         if (error instanceof ValidationException validationException) {
             return buildErrorResponse(
@@ -51,6 +63,8 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
                     validationException.getFieldErrors()
             );
         }
+
+
 
 
         // Manejar EmailAlreadyExistException
